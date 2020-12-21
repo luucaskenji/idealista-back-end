@@ -7,6 +7,7 @@ app.use(express.json());
 
 const tasksController = require('./controllers/tasksController');
 
-app.post("/tasks", tasksController.postTask);
+app.post('/tasks', tasksController.postTask);
+app.get('/tasks', tasksController.getTasks)
 
 module.exports = app;

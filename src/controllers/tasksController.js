@@ -5,22 +5,15 @@ async function postTask(req, res) {
 
   if (!name) return res.sendStatus(422);
 
-  // pegar o retorno do banco
   const newTask = await Task.postInDB(name);
-  // retornar 201
+
   res.status(201).send(newTask);
 }
 
-// async function deleteArticle(req, res) {
-//   const { id } = req.params;
-//   try {
-//     const article = new Article(id);
-//     await article.destroy();
-//     return res.sendStatus(200);
-//   } catch (err) {
-//     console.error(err);
-//     return res.status(500).send(err);
-//   }
-// }
+async function getTasks(req, res) {
+  const tasks = await Task.getAll();
 
-module.exports = { postTask };
+  res.status(200).send(tasks);
+}
+
+module.exports = { postTask, getTasks };
