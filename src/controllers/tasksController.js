@@ -43,4 +43,18 @@ async function editTask(req, res) {
   res.status(200).send(updatedTask);
 }
 
-module.exports = { postTask, getTasks, editTask };
+async function deleteTask(req, res) {
+  let { id } = req.params;
+  if (!id) return res.status(400);
+
+  id = parseInt(id);
+  
+  const requiredTask = await Task.verifyIfTaskExists(id);
+  if (!requiredTask) return res.sendStatus(404);
+
+  await Task.destroyTask(id);
+
+  res.sendStatus(200);
+}
+
+module.exports = { postTask, getTasks, editTask, deleteTask };

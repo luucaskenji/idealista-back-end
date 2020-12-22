@@ -10,5 +10,6 @@ const tasksController = require('./controllers/tasksController');
 app.post('/tasks', tasksController.postTask);
 app.get('/tasks', tasksController.getTasks);
 app.put('/tasks/:id', tasksController.editTask);
+app.delete('/tasks/:id', tasksController.deleteTask);
 
 module.exports = app;

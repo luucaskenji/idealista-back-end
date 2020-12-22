@@ -47,6 +47,10 @@ class Task {
 
     return new Task(updatedTask.id, updatedTask.name, updatedTask.description, updatedTask.isChecked);
   }
+
+  static async destroyTask(id) {
+    await connection.query(`DELETE FROM ${this.tableName} WHERE id=$1`, [id]);
+  }
 }
 
 module.exports = Task;
