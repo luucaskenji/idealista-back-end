@@ -1,5 +1,12 @@
 const Label = require('../models/Label');
+const Task = require('../models/Task');
 const labelsSchemas = require('../schemas/labelsSchemas');
+
+async function getLabels(req, res) {
+    const labels = await Label.getAll();
+
+    res.status(200).send(labels);
+}
 
 async function postLabel(req, res) {
     const { color } = req.body;
@@ -13,4 +20,22 @@ async function postLabel(req, res) {
     res.status(201).send(newLabel);
 }
 
-module.exports = { postLabel };
+async function toggleTaskLabel(req, res) {
+    let { taskId, labelId } = req.params;
+    [taskId, labelId] = [parseInt(taskId), parseInt(labelId)];
+
+    const requiredTask = await Task.verifyIfTaskExists(taskId);
+    const requiredLabel = await Label.verifyIfLabelExists(labelId);
+    if (!requiredTask || !requiredLabel) return res.sendStatus(404);
+
+    const requiredTaskAndLabel = await Label.verifyIfLabelIsSet(taskId, labelId);
+
+    if (requiredTaskAndLabel) {
+        await Label.deleteLabel(taskId, labelId);
+    }
+    else {
+        await Label.setLabel(taskId, labelId);
+    }
+}
+
+module.exports = { postLabel, getLabels, toggleTaskLabel };
