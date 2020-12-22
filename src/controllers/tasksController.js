@@ -1,9 +1,14 @@
-const Task = require("../models/Task");
+const Task = require('../models/Task');
+const tasksSchemas = require('../schemas/tasksSchemas');
 
 async function postTask(req, res) {
   const { name } = req.body;
 
-  if (!name) return res.sendStatus(422);
+  if (!name) return res.sendStatus(400);
+
+  const { error } = tasksSchemas.task.validate(req,body);
+
+  if (error) return res.status(422).send(error.details[0].message);
 
   const newTask = await Task.postInDB(name);
 
