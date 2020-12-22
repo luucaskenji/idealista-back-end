@@ -6,7 +6,7 @@ async function postTask(req, res) {
 
   if (!name) return res.sendStatus(400);
 
-  const { error } = tasksSchemas.task.validate(req.body);
+  const { error } = tasksSchemas.newTask.validate(req.body);
 
   if (error) return res.status(422).send(error.details[0].message);
 
@@ -21,4 +21,24 @@ async function getTasks(req, res) {
   res.status(200).send(tasks);
 }
 
-module.exports = { postTask, getTasks };
+async function editTask(req, res) {
+  let { id } = req.params;
+  if (!id) return res.status(400);
+
+  id = parseInt(id);
+  
+  const requiredTask = await Task.verifyIfTaskExists(id);
+  if (!requiredTask) return res.sendStatus(404);
+
+  const { name, description, isChecked } = req.body;
+  if (!name && !description && !isChecked) return res.sendStatus(400);
+
+  const { error } = tasksSchemas.updateTask.validate(req.body);
+  if (error) return res.status(422).send(error.details[0].message);
+
+  const updatedTask = await Task.updateTaskById(req.body, id);
+
+  res.status(200).send(updatedTask);
+}
+
+module.exports = { postTask, getTasks, editTask };
