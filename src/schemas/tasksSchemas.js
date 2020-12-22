@@ -1,7 +1,7 @@
 const joi = require('joi');
 
 const newTask = joi.object({
-    name: joi.string().pattern(/^[a-zA-Z0-9à-úÀ-Ú\s\,\.\;\!\(\)]+$/).required()
+    name: joi.string().min(5).max(30).pattern(/^[a-zA-Z0-9à-úÀ-Ú\s\,\.\;\!\(\)]+$/).required()
 });
 
 const updateTask = joi.object({
