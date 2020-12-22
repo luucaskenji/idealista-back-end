@@ -25,7 +25,7 @@ class Task {
   }
 
   static async verifyIfTaskExists(id) {
-    const response = await connection.query('SELECT * FROM tasks WHERE id=$1', [id]);
+    const response = await connection.query(`SELECT * FROM ${this.tableName} WHERE id=$1`, [id]);
 
     return response.rows[0];
   }
@@ -34,13 +34,13 @@ class Task {
     let response;
 
     if (newData.name) {
-      response = await connection.query(`UPDATE tasks SET name=$1 WHERE id=$2 RETURNING *`, [newData.name, id]);
+      response = await connection.query(`UPDATE ${this.tableName} SET name=$1 WHERE id=$2 RETURNING *`, [newData.name, id]);
     }
     else if (newData.description) {
-      response = await connection.query(`UPDATE tasks SET description=$1 WHERE id=$2 RETURNING *`, [newData.description, id]);
+      response = await connection.query(`UPDATE ${this.tableName} SET description=$1 WHERE id=$2 RETURNING *`, [newData.description, id]);
     }
-    else if (newData.isChecked) {
-      response = await connection.query(`UPDATE tasks SET "isChecked"=$1 WHERE id=$2 RETURNING *`, [newData.isChecked, id]);
+    else if ("isChecked" in newData) { // if the same logic of other conditions was applied here, there would be conflicts when isChecked === false
+      response = await connection.query(`UPDATE ${this.tableName} SET "isChecked"=$1 WHERE id=$2 RETURNING *`, [newData.isChecked, id]);
     }
 
     const updatedTask = response.rows[0];
