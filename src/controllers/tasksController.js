@@ -6,7 +6,7 @@ async function postTask(req, res) {
 
   if (!name) return res.sendStatus(400);
 
-  const { error } = tasksSchemas.task.validate(req,body);
+  const { error } = tasksSchemas.task.validate(req.body);
 
   if (error) return res.status(422).send(error.details[0].message);
 
