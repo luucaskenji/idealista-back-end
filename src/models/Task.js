@@ -17,8 +17,8 @@ class Task {
     return await Promise.all(results.rows.map(async r => {
       const response = await connection.query(
         `
-          SELECT tasks_labels."labelId" AS id, labels.color AS color FROM tasks
-          JOIN tasks_labels ON tasks.id = tasks_labels."taskId"
+          SELECT tasks_labels."labelId" AS id, labels.color AS color
+          FROM tasks_labels
           JOIN labels ON labels.id = tasks_labels."labelId"
           WHERE tasks_labels."taskId" = $1
         `,
@@ -58,8 +58,8 @@ class Task {
     // getting labels list for the task    
     const results = await connection.query(
       `
-        SELECT tasks_labels."labelId" AS id, labels.color AS color FROM tasks
-        JOIN tasks_labels ON tasks.id = tasks_labels."taskId"
+        SELECT tasks_labels."labelId" AS id, labels.color AS color
+        FROM tasks_labels
         JOIN labels ON labels.id = tasks_labels."labelId"
         WHERE tasks_labels."taskId" = $1
       `,
