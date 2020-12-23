@@ -43,6 +43,7 @@ class Label {
     static async setLabel(taskId, labelId) {
         await connection.query('INSERT INTO tasks_labels ("taskId", "labelId") VALUES ($1, $2)', [taskId, labelId]);
 
+        // getting labels list for the task
         const response = await connection.query(
             `
                 SELECT tasks_labels."labelId", labels.color FROM tasks_labels
@@ -58,6 +59,7 @@ class Label {
     static async deleteLabel(taskId, labelId) {
         await connection.query('DELETE FROM tasks_labels WHERE "taskId"=$1 AND "labelId"=$2', [taskId, labelId]);
 
+        // getting labels list for the task
         const response = await connection.query(
             `
                 SELECT tasks_labels."labelId", labels.color FROM tasks_labels

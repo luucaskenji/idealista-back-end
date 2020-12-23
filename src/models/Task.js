@@ -55,6 +55,7 @@ class Task {
       response = await connection.query(`UPDATE ${this.tableName} SET "isChecked"=$1 WHERE id=$2 RETURNING *`, [newData.isChecked, id]);
     }
 
+    // getting labels list for the task    
     const results = await connection.query(
       `
         SELECT tasks_labels."labelId" AS id, labels.color AS color FROM tasks
