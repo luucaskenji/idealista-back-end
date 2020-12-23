@@ -31,10 +31,14 @@ async function toggleTaskLabel(req, res) {
     const requiredTaskAndLabel = await Label.verifyIfLabelIsSet(taskId, labelId);
 
     if (requiredTaskAndLabel) {
-        await Label.deleteLabel(taskId, labelId);
+        const labelsList = await Label.deleteLabel(taskId, labelId);
+
+        return res.status(200).send(labelsList);
     }
     else {
-        await Label.setLabel(taskId, labelId);
+        const labelsList = await Label.setLabel(taskId, labelId);
+        
+        return res.status(200).send(labelsList);
     }
 }
 

@@ -43,18 +43,30 @@ class Label {
     static async setLabel(taskId, labelId) {
         await connection.query('INSERT INTO tasks_labels ("taskId", "labelId") VALUES ($1, $2)', [taskId, labelId]);
 
-        await connection.query(
+        const response = await connection.query(
             `
                 SELECT tasks_labels."labelId", labels.color FROM tasks_labels
                 JOIN labels ON tasks_labels."labelId" = labels.id
-                WHERE tasks_labels."taskId" = 21;
+                WHERE tasks_labels."taskId" = $1;
             `,
-            
-        )
+            [taskId]            
+        );
+
+        return response.rows.map(r => new Label(r.labelId, r.color));
     }
 
     static async deleteLabel(taskId, labelId) {
-        await connection.query('DELETE FROM tasks_labels WHERE "tasksId"=$1 AND "labelId"=$2', [taskId, labelId]);
+        await connection.query('DELETE FROM tasks_labels WHERE "taskId"=$1 AND "labelId"=$2', [taskId, labelId]);
+
+        const response = await connection.query(
+            `
+                SELECT tasks_labels."labelId", labels.color FROM tasks_labels
+                JOIN labels ON tasks_labels."labelId" = labels.id
+                WHERE tasks_labels."taskId" = $1;
+            `,
+            [taskId]            
+        );
+        return response.rows.map(r => new Label(r.labelId, r.color));
     }
 }
 

@@ -3,25 +3,37 @@ const connection = require("../database");
 class Task {
   static tableName = 'tasks';
 
-  constructor(id, name, description, isChecked) {
+  constructor(id, name, description, isChecked, labels) {
     this.id = id;
     this.name = name;
     this.description = description;
     this.isChecked = isChecked;
-    this.labels = [];
+    this.labels = labels;
   }
 
   static async getAll() {
     const results = await connection.query(`SELECT * FROM ${this.tableName}`)
 
-    return results.rows.map(r => new Task(r.id, r.name, r.description, r.isChecked));
+    return await Promise.all(results.rows.map(async r => {
+      const response = await connection.query(
+        `
+          SELECT tasks_labels."labelId" AS id, labels.color AS color FROM tasks
+          JOIN tasks_labels ON tasks.id = tasks_labels."taskId"
+          JOIN labels ON labels.id = tasks_labels."labelId"
+          WHERE tasks_labels."taskId" = $1
+        `,
+        [r.id]
+      );
+
+      return new Task(r.id, r.name, r.description, r.isChecked, response.rows)
+    }));
   }
   
   static async postInDB(name) {
     const result = await connection.query(`INSERT INTO ${this.tableName} (name) VALUES ($1) RETURNING *`, [name]);
     const newTask = result.rows[0];
 
-    return new Task(newTask.id, newTask.name, newTask.description, newTask.isChecked);
+    return new Task(newTask.id, newTask.name, newTask.description, newTask.isChecked, []);
   }
 
   static async verifyIfTaskExists(id) {
@@ -43,9 +55,19 @@ class Task {
       response = await connection.query(`UPDATE ${this.tableName} SET "isChecked"=$1 WHERE id=$2 RETURNING *`, [newData.isChecked, id]);
     }
 
+    const results = await connection.query(
+      `
+        SELECT tasks_labels."labelId" AS id, labels.color AS color FROM tasks
+        JOIN tasks_labels ON tasks.id = tasks_labels."taskId"
+        JOIN labels ON labels.id = tasks_labels."labelId"
+        WHERE tasks_labels."taskId" = $1
+      `,
+      [id]
+    );
+
     const updatedTask = response.rows[0];
 
-    return new Task(updatedTask.id, updatedTask.name, updatedTask.description, updatedTask.isChecked);
+    return new Task(updatedTask.id, updatedTask.name, updatedTask.description, updatedTask.isChecked, results.rows);
   }
 
   static async destroyTask(id) {
